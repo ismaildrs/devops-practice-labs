@@ -1,0 +1,44 @@
+services:
+  nginx:
+    image: nginx
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf.template
+      - ./docker-entrypoint.sh:/docker-entrypoint.sh
+    environment:
+      - PORT=80
+      - NODE_APP1_DOMAIN=nginx-load-balancer-app1-1:3000
+      - NODE_APP2_DOMAIN=nginx-load-balancer-app2-1:3000
+      - NODE_APP3_DOMAIN=nginx-load-balancer-app3-1:3000
+      - DOLLAR=$
+    ports:
+      - 80:80
+    depends_on:
+      - app1
+      - app2
+      - app3
+    networks:
+      - node-apps-private-net
+
+  app1:
+    build: app/.
+    environment:
+      - PORT=3000
+    networks:
+      - node-apps-private-net
+  
+  app2:
+    build: app/.
+    environment:
+      - PORT=3000
+    networks:
+      - node-apps-private-net
+    
+  app3:
+    build: app/.
+    environment:
+      - PORT=3000
+    networks:
+      - node-apps-private-net
+
+networks:
+  node-apps-private-net:
